@@ -7,6 +7,8 @@ admin.site.site_title = "FEsT Admin Portal"
 admin.site.index_title = "Welcome to FEsT Portal"
 
 urlpatterns = [
-    # path("admin/", admin.site.urls),
-    path('', include('festapp.urls')),
+    path('', views.home, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('login/', views.login_view, name='login'),
+    path('signup/', views.signup, name='signup'),
 ]
