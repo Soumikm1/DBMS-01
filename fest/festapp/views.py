@@ -25,14 +25,31 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'user_type': user_type})
 
 def login_view(request):
+    user_type = 'user_type'
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('dashboard')
-    return render(request, 'login.html')
+        # Assuming you have a dropdown menu with name 'user_type' in your login form
+        user_type = request.POST.get('user_type')
+        if user_type == 'external':
+            return redirect('external_login')
+        elif user_type == 'student':
+            return redirect('student_login')
+        elif user_type == 'volunteer':
+            return redirect('volunteer_login')
+        elif user_type == 'organizer':
+            return redirect('organizer_login')
+    return render(request, 'login.html', {'user_type': user_type})
+
+def external_login(request):
+    pass
+
+def student_login(request):
+    pass
+
+def volunteer_login(request):
+    pass
+
+def organizer_login(request):
+    pass
 
 def signup(request):
     if request.method == 'POST':
