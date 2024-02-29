@@ -8,7 +8,7 @@ from datetime import datetime
 
 def home(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return dashboard(request)
     return render(request, 'home.html')
 
 @login_required(login_url='/login')
@@ -36,14 +36,34 @@ def login_view(request):
 
 def signup(request):
     if request.method == 'POST':
-        # Assuming signup form fields are posted here
-        # You can create a new user for external participants
-        # Ensure appropriate form validation and user creation process
-        # Example:
-        # username = request.POST.get('username')
-        # password = request.POST.get('password')
-        # email = request.POST.get('email')
-        # user = User.objects.create_user(username=username, email=email, password=password)
-        # user.groups.add(Group.objects.get(name='External Participants'))
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+        # Check if username is available
+        if User.objects.filter(username=username).exists():
+            return render(request, 'signup.html', {'error_message': 'Username already exists.'})
+        # Create a new user
+        user = User.objects.create_user(username=username, email=email, password=password)
+        # Add the new user to the 'External Participants' group
+        external_participants_group = Group.objects.get(name='External Participants')
+        user.groups.add(external_participants_group)
+        # Redirect to login page
         return redirect('login')
     return render(request, 'signup.html')
+
+@login_required(login_url='/login')
+def dashboard(request):
+    user_type = None
+    if request.user.groups.filter(name='External Participants').exists():
+        user_type = 'external'
+        user_info = ExternalParticipant.objects.get(user=request.user)
+    elif request.user.groups.filter(name='Students').exists():
+        user_type = 'student'
+        user_info = Student.objects.get(user=request.user)
+    elif request.user.groups.filter(name='Volunteers').exists():
+        user_type = 'volunteer'
+        user_info = Volunteer.objects.get(user=request.user)
+    elif request.user.groups.filter(name='Organizers/Judges').exists():
+        user_type = 'organizer'
+        user_info = OrganizerJudge.objects.get(user=request.user)
+    return render(request, 'dashboard.html', {'user_type': user_type, 'user_info': user_info})
