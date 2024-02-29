@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from festapp.models import Item_List
+from festapp.models import ExternalUser, Student, Volunteer, Organizer
 from datetime import datetime
 
 def home(request):
@@ -53,34 +53,42 @@ def organizer_login(request):
 
 def signup(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        # Extract form data
+        name = request.POST.get('name')
+        college_id = request.POST.get('college_id')
+        user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        email = request.POST.get('email')
-        # Check if username is available
-        if User.objects.filter(username=username).exists():
-            return render(request, 'signup.html', {'error_message': 'Username already exists.'})
-        # Create a new user
-        user = User.objects.create_user(username=username, email=email, password=password)
-        # Add the new user to the 'External Participants' group
-        external_participants_group = Group.objects.get(name='External Participants')
-        user.groups.add(external_participants_group)
-        # Redirect to login page
+        
+        # Create a new ExternalUser instance
+        new_external_user = ExternalUser(
+            name=name,
+            college_id=college_id,
+            user_name=user_name,
+            password=password
+        )
+        
+        # Save the new ExternalUser instance
+        new_external_user.save()
+        
+        # Redirect to the login page
         return redirect('login')
+        
     return render(request, 'signup.html')
 
 @login_required(login_url='/login')
 def dashboard(request):
-    user_type = None
-    if request.user.groups.filter(name='External Participants').exists():
-        user_type = 'external'
-        user_info = ExternalParticipant.objects.get(user=request.user)
-    elif request.user.groups.filter(name='Students').exists():
-        user_type = 'student'
-        user_info = Student.objects.get(user=request.user)
-    elif request.user.groups.filter(name='Volunteers').exists():
-        user_type = 'volunteer'
-        user_info = Volunteer.objects.get(user=request.user)
-    elif request.user.groups.filter(name='Organizers/Judges').exists():
-        user_type = 'organizer'
-        user_info = OrganizerJudge.objects.get(user=request.user)
-    return render(request, 'dashboard.html', {'user_type': user_type, 'user_info': user_info})
+    # user_type = None
+    # if request.user.groups.filter(name='External Participants').exists():
+    #     user_type = 'external'
+    #     user_info = ExternalParticipant.objects.get(user=request.user)
+    # elif request.user.groups.filter(name='Students').exists():
+    #     user_type = 'student'
+    #     user_info = Student.objects.get(user=request.user)
+    # elif request.user.groups.filter(name='Volunteers').exists():
+    #     user_type = 'volunteer'
+    #     user_info = Volunteer.objects.get(user=request.user)
+    # elif request.user.groups.filter(name='Organizers/Judges').exists():
+    #     user_type = 'organizer'
+    #     user_info = OrganizerJudge.objects.get(user=request.user)
+    # return render(request, 'dashboard.html', {'user_type': user_type, 'user_info': user_info})
+    pass
