@@ -4,25 +4,20 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from festapp.models import ExternalUser, Student, Volunteer, Organizer
-from datetime import datetime
+# from datetime import datetime
 
 def home(request):
     if request.user.is_authenticated:
-        return dashboard(request)
+        # Redirect directly to the respective dashboard based on user type
+        if request.user.groups.filter(name='External Participants').exists():
+            return redirect('external_dashboard')
+        elif request.user.groups.filter(name='Students').exists():
+            return redirect('student_dashboard')
+        elif request.user.groups.filter(name='Volunteers').exists():
+            return redirect('volunteer_dashboard')
+        elif request.user.groups.filter(name='Organizers/Judges').exists():
+            return redirect('organizer_dashboard')
     return render(request, 'home.html')
-
-@login_required(login_url='/login')
-def dashboard(request):
-    user_type = None
-    if request.user.groups.filter(name='External Participants').exists():
-        user_type = 'external'
-    elif request.user.groups.filter(name='Students').exists():
-        user_type = 'student'
-    elif request.user.groups.filter(name='Volunteers').exists():
-        user_type = 'volunteer'
-    elif request.user.groups.filter(name='Organizers/Judges').exists():
-        user_type = 'organizer'
-    return render(request, 'dashboard.html', {'user_type': user_type})
 
 def login_view(request):
     user_type = 'user_type'
@@ -40,16 +35,92 @@ def login_view(request):
     return render(request, 'login.html', {'user_type': user_type})
 
 def external_login(request):
-    pass
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        password = request.POST.get('password')
+        
+        # Authenticate user
+        user = authenticate(request, user_name=user_name, password=password, user_type='external')
+        
+        # Check if authentication was successful
+        if user is not None:
+            # If user is authenticated, log them in
+            login(request, user)
+            # Redirect to student dashboard or any desired page
+            return redirect('external_dashboard')
+        else:
+            # If authentication failed, display error message
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')  # Redirect back to login page with error message
+    else:
+        # If request method is not POST, render the login page
+        return render(request, 'login.html')
 
 def student_login(request):
-    pass
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        password = request.POST.get('password')
+        
+        # Authenticate user
+        user = authenticate(request, user_name=user_name, password=password, user_type='student')
+        
+        # Check if authentication was successful
+        if user is not None:
+            # If user is authenticated, log them in
+            login(request, user)
+            # Redirect to student dashboard or any desired page
+            return redirect('student_dashboard')
+        else:
+            # If authentication failed, display error message
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')  # Redirect back to login page with error message
+    else:
+        # If request method is not POST, render the login page
+        return render(request, 'login.html')
 
 def volunteer_login(request):
-    pass
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        password = request.POST.get('password')
+        
+        # Authenticate user
+        user = authenticate(request, user_name=user_name, password=password, user_type='volunteer')
+        
+        # Check if authentication was successful
+        if user is not None:
+            # If user is authenticated, log them in
+            login(request, user)
+            # Redirect to student dashboard or any desired page
+            return redirect('volunteer_dashboard')
+        else:
+            # If authentication failed, display error message
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')  # Redirect back to login page with error message
+    else:
+        # If request method is not POST, render the login page
+        return render(request, 'login.html')
 
 def organizer_login(request):
-    pass
+    if request.method == 'POST':
+        user_name = request.POST.get('user_name')
+        password = request.POST.get('password')
+        
+        # Authenticate user
+        user = authenticate(request, user_name=user_name, password=password, user_type='organizer')
+        
+        # Check if authentication was successful
+        if user is not None:
+            # If user is authenticated, log them in
+            login(request, user)
+            # Redirect to student dashboard or any desired page
+            return redirect('organizer_dashboard')
+        else:
+            # If authentication failed, display error message
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')  # Redirect back to login page with error message
+    else:
+        # If request method is not POST, render the login page
+        return render(request, 'login.html')
 
 def signup(request):
     if request.method == 'POST':
@@ -75,20 +146,23 @@ def signup(request):
         
     return render(request, 'signup.html')
 
+# Separate dashboard views for different user types
 @login_required(login_url='/login')
-def dashboard(request):
-    # user_type = None
-    # if request.user.groups.filter(name='External Participants').exists():
-    #     user_type = 'external'
-    #     user_info = ExternalParticipant.objects.get(user=request.user)
-    # elif request.user.groups.filter(name='Students').exists():
-    #     user_type = 'student'
-    #     user_info = Student.objects.get(user=request.user)
-    # elif request.user.groups.filter(name='Volunteers').exists():
-    #     user_type = 'volunteer'
-    #     user_info = Volunteer.objects.get(user=request.user)
-    # elif request.user.groups.filter(name='Organizers/Judges').exists():
-    #     user_type = 'organizer'
-    #     user_info = OrganizerJudge.objects.get(user=request.user)
-    # return render(request, 'dashboard.html', {'user_type': user_type, 'user_info': user_info})
+def external_dashboard(request):
+    # Logic for external user dashboard
+    pass
+
+@login_required(login_url='/login')
+def student_dashboard(request):
+    # Logic for student dashboard
+    pass
+
+@login_required(login_url='/login')
+def volunteer_dashboard(request):
+    # Logic for volunteer dashboard
+    pass
+
+@login_required(login_url='/login')
+def organizer_dashboard(request):
+    # Logic for organizer dashboard
     pass

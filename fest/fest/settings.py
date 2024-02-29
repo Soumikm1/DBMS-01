@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-z*_z9yr7gmdjux0l!kagko5pvmvld6c6zh#(ruq%o!g(bz835q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -121,3 +121,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTHENTICATION_BACKENDS = [
+    'festapp.backends.CustomUserBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Default backend for Django's built-in User model
+]
