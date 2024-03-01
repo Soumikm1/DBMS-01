@@ -123,7 +123,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTHENTICATION_BACKENDS = [
-    'festapp.backends.CustomUserBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Default backend for Django's built-in User model
-]
+# AUTHENTICATION_BACKENDS = [
+#     'festapp.backends.CustomUserBackend',
+#     'django.contrib.auth.backends.ModelBackend',  # Default backend for Django's built-in User model
+# ]

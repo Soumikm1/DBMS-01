@@ -3,8 +3,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpResponse
 from festapp.models import ExternalUser, Student, Volunteer, Organizer
 # from datetime import datetime
+from festapp.backends import authenticate_student, authenticate_volunteer, authenticate_organizer, authenticate_external_user
 
 def home(request):
     if request.user.is_authenticated:
@@ -38,88 +40,67 @@ def external_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        
-        # Authenticate user
-        user = authenticate(request, user_name=user_name, password=password, user_type='external')
-        
-        # Check if authentication was successful
+        user = authenticate_external_user(user_name, password)
         if user is not None:
-            # If user is authenticated, log them in
             login(request, user)
-            # Redirect to student dashboard or any desired page
             return redirect('external_dashboard')
         else:
-            # If authentication failed, display error message
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')  # Redirect back to login page with error message
+            return redirect('login')
+    elif request.method == 'GET':
+        return render(request, 'external_login.html')
     else:
-        # If request method is not POST, render the login page
         return render(request, 'login.html')
 
 def student_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        
-        # Authenticate user
-        user = authenticate(request, user_name=user_name, password=password, user_type='student')
-        
-        # Check if authentication was successful
+        user = authenticate_student(user_name, password)
+        print(user)
         if user is not None:
-            # If user is authenticated, log them in
+            print("Going to dashboard")
             login(request, user)
-            # Redirect to student dashboard or any desired page
+            print("Going to dashboard1")
             return redirect('student_dashboard')
         else:
-            # If authentication failed, display error message
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')  # Redirect back to login page with error message
+            return redirect('login')
+    elif request.method == 'GET':
+        return render(request, 'student_login.html')
     else:
-        # If request method is not POST, render the login page
         return render(request, 'login.html')
 
 def volunteer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        
-        # Authenticate user
-        user = authenticate(request, user_name=user_name, password=password, user_type='volunteer')
-        
-        # Check if authentication was successful
+        user = authenticate_volunteer(user_name, password)
         if user is not None:
-            # If user is authenticated, log them in
             login(request, user)
-            # Redirect to student dashboard or any desired page
             return redirect('volunteer_dashboard')
         else:
-            # If authentication failed, display error message
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')  # Redirect back to login page with error message
+            return redirect('login')
+    elif request.method == 'GET':
+        return render(request, 'volunteer_login.html')
     else:
-        # If request method is not POST, render the login page
         return render(request, 'login.html')
 
 def organizer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        
-        # Authenticate user
-        user = authenticate(request, user_name=user_name, password=password, user_type='organizer')
-        
-        # Check if authentication was successful
+        user = authenticate_organizer(user_name, password)
         if user is not None:
-            # If user is authenticated, log them in
             login(request, user)
-            # Redirect to student dashboard or any desired page
             return redirect('organizer_dashboard')
         else:
-            # If authentication failed, display error message
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')  # Redirect back to login page with error message
+            return redirect('login')
+    elif request.method == 'GET':
+        return render(request, 'organizer_login.html')
     else:
-        # If request method is not POST, render the login page
         return render(request, 'login.html')
 
 def signup(request):
@@ -149,20 +130,16 @@ def signup(request):
 # Separate dashboard views for different user types
 @login_required(login_url='/login')
 def external_dashboard(request):
-    # Logic for external user dashboard
-    pass
+    return HttpResponse("External Dashboard")
 
 @login_required(login_url='/login')
 def student_dashboard(request):
-    # Logic for student dashboard
-    pass
+    return HttpResponse("Student Dashboard")
 
 @login_required(login_url='/login')
 def volunteer_dashboard(request):
-    # Logic for volunteer dashboard
-    pass
+    return HttpResponse("Volunteer Dashboard")
 
 @login_required(login_url='/login')
 def organizer_dashboard(request):
-    # Logic for organizer dashboard
-    pass
+    return HttpResponse("organizer Dashboard")

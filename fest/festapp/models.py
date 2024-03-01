@@ -10,7 +10,8 @@ class ExternalUser(models.Model):
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
     roll = models.CharField(max_length=100)
-    student_name = models.CharField(max_length=100)  # used as user_name later on
+    username = models.CharField(max_length=100)
+    # student_name = models.CharField(max_length=100)  # used as user_name later on
     department = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
 
