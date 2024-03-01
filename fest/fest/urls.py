@@ -16,9 +16,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include  # Import include
 
+admin.site.site_header = "FEsT Admin"
+admin.site.site_title = "FEsT Admin Portal"
+admin.site.index_title = "Welcome to FEsT Portal"
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('', include('festapp.urls')),  # Include the URLs of the fest app
+    path('admin/', admin.site.urls),
 ]
