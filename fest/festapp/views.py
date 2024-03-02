@@ -7,18 +7,8 @@ from django.http import HttpResponse
 from festapp.models import ExternalUser, Student, Volunteer, Organizer
 # from datetime import datetime
 from festapp.backends import authenticate_student, authenticate_volunteer, authenticate_organizer, authenticate_external_user
-
+@login_required(login_url='/login')
 def home(request):
-    if request.user.is_authenticated:
-        # Redirect directly to the respective dashboard based on user type
-        if request.user.groups.filter(name='External Participants').exists():
-            return redirect('external_dashboard')
-        elif request.user.groups.filter(name='Students').exists():
-            return redirect('student_dashboard')
-        elif request.user.groups.filter(name='Volunteers').exists():
-            return redirect('volunteer_dashboard')
-        elif request.user.groups.filter(name='Organizers/Judges').exists():
-            return redirect('organizer_dashboard')
     return render(request, 'home.html')
 
 def login_view(request):

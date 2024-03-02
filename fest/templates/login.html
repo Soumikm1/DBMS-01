@@ -1,22 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
-    <form action="{% url 'login' %}" method="post">
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .user-type-section {
+        display: none;
+    }
+</style>
+<div class="flex justify-around mx-24">
+<div class="left w-auto ">
+<div class="flex mt-20  flex-col justify-center px-6 py-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <h2 class=" text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Login to your account</h2>
+    </div>
+
+    <select name="user_type" id="user_type" onchange="showUserTypeSection()" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 w-40 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-4  mb-2 mx-auto" >
+        <option class="bg-gray-200 text-black" value="" selected disabled>Select User Type</option>
+
+<option class="bg-white text-black" value="external">External Participant</option>
+<option class="bg-white text-black" value="student">Student</option>
+<option class="bg-white text-black" value="volunteer">Volunteer</option>
+<option class="bg-white text-black" value="organizer">Organizer/Judge</option>
+</select>
+  
+   
+  </div>
+  
+
+
+        <!-- Student Section -->
+        <div class="user-type-section  sm:mx-auto sm:w-full sm:max-w-sm "  id="studentSection">
+         <form action="{% url 'student_login' %}" class="space-y-2" method="post">
         {% csrf_token %}
-        <label for="user_type">Select user type:</label>
-        <select name="user_type" id="user_type">
-            <option value="external">External Participant</option>
-            <option value="student">Student</option>
-            <option value="volunteer">Volunteer</option>
-            <option value="organizer">Organizer/Judge</option>
-        </select>
-        <input type="submit" value="Submit">
+        <div>
+        <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required>
+
+         </div>
+         <div>
+        <label required   for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+        <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+        <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+         </div>
+         </form>
+         <p class="mt-10 text-center text-sm text-gray-500">
+           
+            <a href="{% url 'signup' %}" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign up as External User </a>
+          </p>
+        </div>
+
+
+
+        <div class="user-type-section mt-10 sm:mx-auto sm:w-full sm:max-w-sm "  id="volunteer_login">
+
+         <form action="{% url 'volunteer_login' %}" class="space-y-6" method="post">
+        {% csrf_token %}
+        <div>
+        <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required>
+
+         </div>
+         <div>
+        <label required   for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+        <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+        <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+         </div>
+         </form>
+
+         <p class="mt-10 text-center text-sm text-gray-500">
+           
+            <a href="{% url 'signup' %}" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign up as External User </a>
+          </p>
+        </div>
+
+        <!-- <div class="user-type-section" id="volunteer_login">
+            <h1>Volunteer Login</h1>
+            <form action="{% url 'volunteer_login' %}" method="post">
+                {% csrf_token %}
+                <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+                <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required><br><br>
+                <label for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+                <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+                <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+            </form>
+        </div> -->
+
+        <div class="user-type-section mt-10 sm:mx-auto sm:w-full sm:max-w-sm "  id="organizer_login">
+
+         <form action="{% url 'organizer_login' %}" class="space-y-6" method="post">
+        {% csrf_token %}
+        <div>
+        <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required>
+
+         </div>
+         <div>
+        <label required   for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+        <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+        <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+         </div>
+         </form>
+         <p class="mt-10 text-center text-sm text-gray-500">
+           
+            <a href="{% url 'signup' %}" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign up as External User </a>
+          </p>
+        </div>
+
+        <!-- <div class="user-type-section" id="organizer_login">
+            <h1>Organizer/Judge Login</h1>
+    <form action="{% url 'organizer_login' %}" method="post">
+        {% csrf_token %}
+        <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required><br><br>
+        <label for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+        <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
     </form>
-</body>
-</html>
+        </div> -->
+
+
+
+        <div class="user-type-section mt-10 sm:mx-auto sm:w-full sm:max-w-sm "  id="external_login">
+
+         <form action="{% url 'external_login' %}" class="space-y-6" method="post">
+        {% csrf_token %}
+        <div>
+        <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900" >Username:</label>
+        <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required>
+
+         </div>
+         <div>
+        <label required   for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+        <input class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+        <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+         </div>
+         </form>
+         <p class="mt-10 text-center text-sm text-gray-500">
+           
+            <a href="{% url 'signup' %}" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Sign up as External User </a>
+          </p>
+        </div>
+
+
+
+
+
+        <!-- <div class="user-type-section" id="external_login">
+            <h1>External Participant Login</h1>
+            <form action="{% url 'external_login' %}" method="post">
+                {% csrf_token %}
+                <label for="user_name" class="block text-sm font-medium leading-6 text-gray-900">Username:</label>
+                <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="text" id="user_name" name="user_name" required><br><br>
+                <label for="password" class="block text-sm font-medium leading-6 text-gray-900" >Password:</label>
+                <input required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" type="password" id="password" name="password" required><br><br>
+                <input  type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" value="Login">
+            </form>
+        </div> -->
+
+        <!-- Other Sections (similar structure) -->
+
+    </form>
+
+
+</div>
+
+
+<div class="right w-auto ">
+    
+
+
+  
+<img class="h-[80vh] m-14 max-w-lg rounded-lg" src="https://i.pinimg.com/564x/e7/8c/18/e78c185fe3c3f947511bc3eb3da70901.jpg" alt="image description">
+
+  
+</div>
+</div>
+    <script>
+        function showUserTypeSection() {
+            var userType = document.getElementById("user_type").value;
+            var sections = document.querySelectorAll('.user-type-section');
+
+            sections.forEach(function(section) {
+                section.style.display = 'none';
+            });
+
+            if (userType === 'student') {
+                document.getElementById('studentSection').style.display = 'block';
+            } 
+
+            if (userType === 'volunteer') {
+                document.getElementById('volunteer_login').style.display = 'block';
+            } 
+
+            if (userType === 'organizer') {
+                document.getElementById('organizer_login').style.display = 'block';
+            } 
+            
+            if (userType === 'external') {
+                document.getElementById('external_login').style.display = 'block';
+            } 
+
+            // Add similar blocks for other user types
+
+            // You can customize this logic based on your form structure
+        }
+    </script>
+
+
+{% endblock %}
