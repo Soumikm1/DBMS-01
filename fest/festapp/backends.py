@@ -8,8 +8,11 @@ def authenticate_external_user(username, password):
         return None
 
 def authenticate_student(username, password):
+    print(username)
+    print(password)
     try:
-        student = Student.objects.get(student_name=username, password=password)
+        student = Student.objects.get(username=username, password=password)
+        print(student)
         return student
     except Student.DoesNotExist:
         return None
@@ -22,6 +25,8 @@ def authenticate_volunteer(username, password):
         return None
 
 def authenticate_organizer(username, password):
+    print(username)
+    print(password)
     try:
         organizer = Organizer.objects.get(user_name=username, password=password)
         return organizer

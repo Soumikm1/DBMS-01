@@ -40,8 +40,11 @@ def external_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
+        print(user_name)
+        print(password)
         user = authenticate_external_user(user_name, password)
         if user is not None:
+            user = authenticate(username = user_name, password = password)
             login(request, user)
             return redirect('external_dashboard')
         else:
@@ -56,12 +59,13 @@ def student_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
+        print(user_name)
+        print(password)
         user = authenticate_student(user_name, password)
         print(user)
         if user is not None:
-            print("Going to dashboard")
+            user = authenticate(username = user_name, password = password)
             login(request, user)
-            print("Going to dashboard1")
             return redirect('student_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
@@ -75,8 +79,12 @@ def volunteer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
+        print(user_name)
+        print(password)
         user = authenticate_volunteer(user_name, password)
+        print(user)
         if user is not None:
+            user = authenticate(username = user_name, password = password)
             login(request, user)
             return redirect('volunteer_dashboard')
         else:
@@ -91,8 +99,12 @@ def organizer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
+        print(user_name)
+        print(password)
         user = authenticate_organizer(user_name, password)
+        print(user)
         if user is not None:
+            user = authenticate(username = user_name, password = password)
             login(request, user)
             return redirect('organizer_dashboard')
         else:
@@ -110,6 +122,7 @@ def signup(request):
         college_id = request.POST.get('college_id')
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
+        email = request.POST.get('email')
         
         # Create a new ExternalUser instance
         new_external_user = ExternalUser(
@@ -118,13 +131,15 @@ def signup(request):
             user_name=user_name,
             password=password
         )
-        
+        print("saving new user")
         # Save the new ExternalUser instance
         new_external_user.save()
-        
+        print("New User " + name + "saved")
+        create_default_user(user_name, email, password)
         # Redirect to the login page
         return redirect('login')
-        
+    elif request.method == 'GET':
+        return render(request, 'signup.html')
     return render(request, 'signup.html')
 
 # Separate dashboard views for different user types
@@ -143,3 +158,7 @@ def volunteer_dashboard(request):
 @login_required(login_url='/login')
 def organizer_dashboard(request):
     return HttpResponse("organizer Dashboard")
+
+def create_default_user(username, email, password):
+    user = User.objects.create_user(username=username, email=email, password=password)
+    return user
