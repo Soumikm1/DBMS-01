@@ -11,6 +11,14 @@ from festapp.backends import authenticate_student, authenticate_volunteer, authe
 # def home(request):
 #     return render(request, 'home.html')
 
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import EventCreationForm
+from .models import Organizer
+
+
+
 @login_required(login_url='/login')
 def home(request):
     events = Event.objects.all()
@@ -74,10 +82,8 @@ def student_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        print(user_name)
-        print(password)
+
         user = authenticate_student(user_name, password)
-        print(user)
         if user is not None:
             user = authenticate(username = user_name, password = password)
             login(request, user)
@@ -110,25 +116,31 @@ def volunteer_login(request):
     else:
         return render(request, 'login.html')
 
+from django.contrib.auth import authenticate, login
+# from django.shortcuts import render, redirect, messages
+
 def organizer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        print(user_name)
-        print(password)
-        user = authenticate_organizer(user_name, password)
-        print(user)
+
+        user = authenticate(request, username=user_name, password=password)
+
         if user is not None:
-            user = authenticate(username = user_name, password = password)
             login(request, user)
             return redirect('organizer_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')
+            return redirect('/')
     elif request.method == 'GET':
         return render(request, 'organizer_login.html')
     else:
         return render(request, 'login.html')
+
+
+
+
+
 
 def signup(request):
     if request.method == 'POST':
@@ -157,6 +169,61 @@ def signup(request):
         return render(request, 'signup.html')
     return render(request, 'signup.html')
 
+
+
+# @login_required(login_url='/login')
+# def organizer_dashboard(request):
+#     return render(request, 'organizer_dashboard.html')
+
+
+# views.py
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import EventCreationForm
+
+from django.shortcuts import render, redirect
+from .models import Event
+from .forms import EventCreationForm
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from .forms import EventCreationForm
+from .models import Organizer
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, HttpResponse
+from .forms import EventCreationForm
+from .models import Organizer
+
+@login_required(login_url='/login')
+def create_event(request):
+    # Ensure the user is an organizer
+
+    if not Organizer.objects.filter(user_name=request.user).exists():
+        return HttpResponse("You don't have permission to access this page.")
+
+    if request.method == 'POST':
+        form = EventCreationForm(request.POST)
+        if form.is_valid():
+            # Save the event with organizers in a single step
+            event = form.save(commit=False)
+            event.user = request.user  # Assign current user as organizer
+            event.save()  # Save the event and related fields
+
+            # Alternative approach (if the user can belong to multiple organizers)
+            # organizers = Organizer.objects.filter(user=request.user)  # Get organizers for the user
+            # event.organizers.set(organizers)  # Add organizers to the event
+
+            return HttpResponse('Event created successfully')
+    else:
+        form = EventCreationForm()
+
+    return render(request, 'create_event.html', {'form': form})
+
+from django.shortcuts import render
+
+
 # Separate dashboard views for different user types
 @login_required(login_url='/login')
 def external_dashboard(request):
@@ -170,9 +237,34 @@ def student_dashboard(request):
 def volunteer_dashboard(request):
     return HttpResponse("Volunteer Dashboard")
 
-@login_required(login_url='/login')
+
 def organizer_dashboard(request):
-    return HttpResponse("organizer Dashboard")
+    # Your logic for the organizer dashboard goes here
+    return render(request, 'organizer_dashboard.html')
+
+# @login_required(login_url='/login')
+# def organizer_dashboard(request):
+#     if request.method == 'POST':
+#         form = EventCreationForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             event = form.save()(commit=False)
+            
+#             # Get the organizer
+#             organizers = Organizer.objects.filter(user_name=request.user.username)
+#             event.save()  # Now we can save the event to generate its ID
+#             event.organizers.set(organizers)
+            
+#             # Associate the event with the organizer
+
+#             event.save()
+
+#             return redirect('organizer_dashboard')
+#     else:
+#         form = EventCreationForm()
+
+#     return render(request, 'organizer_dashboard.html', {'form': form})
+
+
 
 def create_default_user(username, email, password):
     user = User.objects.create_user(username=username, email=email, password=password)
