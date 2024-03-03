@@ -1,16 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login or Signup</title>
-</head>
-<body>
-    <h1>Welcome to our website!</h1>
-    <p>Please choose an option:</p>
-    <ul>
-        <li><a href="/login/">Login</a></li>
-        <li><a href="/signup/">Signup</a></li>
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+
+<div class="">
+
+<h1 class="mb-24 text-4xl  text-center  font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Upcoming Events</h1>
+
+{% if events %}
+<div class="card-container flex mt-10">
+    {% for event in events %}
+
+    
+        <div class="card mx-24 border shadow-xl rounded-lg px-2 py-2">
+            
+            {% if event.thumbnail %}
+                <img src="{{ event.thumbnail.url }}" alt="{{ event.event_name }} thumbnail" class="rounded-lg" style="max-width: 400px; max-height: 400px;">
+            {% else %}
+                No thumbnail available.
+            {% endif %}
+            <br>
+            {% comment %} <strong>{{ event.event_name }}</a></strong> {% endcomment %}
+            <h3 class="text-xl font-semibold leading-none tracking-tighter text-neutral-600">{{ event.event_name }}</h3>
+            
+            <div class=" flex pt-6 space-x-1 text-sm text-gray-500">
+                <time datetime="2020-03-10">{{ event.event_date }}</time>
+                 <br>
+                
+              </div>
+
+              <div class="flex justify-between mx-4">
+                <p class="text-lg font-normal text-gray-500">Type: {{ event.event_type }}</p>
+                <button class="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onclick="goToEvent({{ event.id }})">
+                    Go to Event
+                </button>
+
+        
+            </div>
+            
+            
+            
+
+        </div>
+        {% if forloop.counter|divisibleby:4 and not forloop.last %}
+            </div><div class="card-container">
+        {% endif %}
+    {% endfor %}
+</div>
+{% else %}
+    <p>No events found.</p>
+{% endif %}
+</div>
+<script>
+    function goToEvent(eventId) {
+        window.location.href = '/event/' + eventId + '/';
+    }
+</script>
+{% endblock %}

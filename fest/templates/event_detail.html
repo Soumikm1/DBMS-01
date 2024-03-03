@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_filters %}
+
+
+<h1>{{ event.event_name }} Details</h1>
+
+<strong>{{ event.event_name }}</strong><br>
+Date: {{ event.event_date }}<br>
+Type: {{ event.event_type }}<br>
+
+{% if event.thumbnail %}
+    <img src="{{ event.thumbnail.url }}" alt="{{ event.event_name }} thumbnail" style="max-width: 400px; max-height: 400px;">
+{% else %}
+    No thumbnail available.
+{% endif %}
+
+<!-- Display Winners -->
+<h2>Winners</h2>
+{% for winner in event.winners.all %}
+    <p>{{ winner.user.username }} - Position: {{ winner.position }}</p>
+{% endfor %}
+
+<!-- Add more details as needed -->
+
+{% if user.is_authenticated %}
+    
+
+    {% if user|is_registered:event %}
+        <p>You are already registered for this event.</p>
+    {%else%}
+    <form action="{% url 'register_event' event.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Register for this event</button>
+    </form>
+    {% endif %}
+
+{% else %}
+    <p>Login to register for this event</p>
+{% endif %}
+
+{% endblock %}
