@@ -14,9 +14,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
 from django.contrib import admin
 from django.urls import path, include  # Import include
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 admin.site.site_header = "FEsT Admin"
 admin.site.site_title = "FEsT Admin Portal"
@@ -26,3 +28,4 @@ urlpatterns = [
     path('', include('festapp.urls')),  # Include the URLs of the fest app
     path('admin/', admin.site.urls),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

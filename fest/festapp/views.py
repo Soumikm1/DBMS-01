@@ -1,15 +1,40 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse
-from festapp.models import ExternalUser, Student, Volunteer, Organizer
+from festapp.models import ExternalUser, Student, Volunteer, Organizer ,Event , Registration
 # from datetime import datetime
 from festapp.backends import authenticate_student, authenticate_volunteer, authenticate_organizer, authenticate_external_user
+# @login_required(login_url='/login')
+# def home(request):
+#     return render(request, 'home.html')
+
 @login_required(login_url='/login')
 def home(request):
-    return render(request, 'home.html')
+    events = Event.objects.all()
+    return render(request, 'home.html', {'events': events})
+
+
+@login_required
+def register_event(request, event_id):
+    event = Event.objects.get(pk=event_id)
+    user = request.user
+
+    if Registration.objects.filter(user=user, event=event).exists():
+        messages.warning(request, 'You are already registered for this event.')
+    else:
+        Registration.objects.create(user=user, event=event)
+        messages.success(request, 'Successfully registered for the event.')
+
+    return redirect('event_detail', event_id=event.id)
+
+@login_required(login_url='/login')
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    return render(request, 'event_detail.html', {'event': event})
+
 
 def login_view(request):
     user_type = 'user_type'
