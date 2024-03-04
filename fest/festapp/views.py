@@ -20,9 +20,9 @@ from .models import Organizer
 
 
 @login_required(login_url='/login')
-def home(request):
+def home(request, type = None):
     events = Event.objects.all()
-    return render(request, 'home.html', {'events': events})
+    return render(request, 'home.html', {'events': events,'type' : type})
 
 
 @login_required
@@ -69,52 +69,51 @@ def external_login(request):
         if user is not None:
             user = authenticate(username = user_name, password = password)
             login(request, user)
-            return redirect('external_dashboard')
+            home_url = reverse('home', kwargs={'type': "participant"})
+            return redirect(home_url)
         else:
             messages.error(request, 'Invalid username or password.')
             return redirect('login')
     elif request.method == 'GET':
-        return render(request, 'external_login.html')
+        return render(request, 'external_login.html', {'request': request})
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'request': request})
 
 def student_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-
         user = authenticate_student(user_name, password)
         if user is not None:
-            user = authenticate(username = user_name, password = password)
+            user = authenticate(username=user_name, password=password)
             login(request, user)
-            return redirect('student_dashboard')
+            home_url = reverse('home', kwargs={'type': "student"})
+            return redirect(home_url)
         else:
             messages.error(request, 'Invalid username or password.')
             return redirect('login')
     elif request.method == 'GET':
-        return render(request, 'student_login.html')
+        return render(request, 'student_login.html', {'request': request})
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'request': request})
 
 def volunteer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-        print(user_name)
-        print(password)
         user = authenticate_volunteer(user_name, password)
-        print(user)
         if user is not None:
             user = authenticate(username = user_name, password = password)
             login(request, user)
-            return redirect('volunteer_dashboard')
+            home_url = reverse('home', kwargs={'type': "volunteer"})
+            return redirect(home_url)
         else:
             messages.error(request, 'Invalid username or password.')
             return redirect('login')
     elif request.method == 'GET':
-        return render(request, 'volunteer_login.html')
+        return render(request, 'volunteer_login.html', {'request': request})
     else:
-        return render(request, 'login.html')
+        return render(request, 'login.html', {'request': request})
 
 from django.contrib.auth.models import AnonymousUser
 
@@ -122,19 +121,14 @@ def organizer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
-
         user = authenticate_organizer(username=user_name, password=password)
         if user is not None:
-            # Ensure the user is an actual User object before calling login
-            if isinstance(user, AnonymousUser):
-                messages.error(request, 'Invalid username or password.')
-                return redirect('login')
-
+            user = authenticate(username = user_name, password = password)
             login(request, user)
             return redirect('organizer_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
-            return redirect('login')
+            return render(request, 'login.html', {'request': request})
     elif request.method == 'GET':
         return render(request, 'organizer_login.html')
     else:
@@ -199,14 +193,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
 from .forms import EventCreationForm
 from .models import Organizer
-from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import EventCreationForm
 from .models import Organizer
-from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .forms import EventCreationForm
 from .models import Organizer
+from django.urls import reverse
 
 @login_required(login_url='/login')
 def create_event(request):
@@ -229,19 +222,6 @@ def create_event(request):
         form = EventCreationForm()
 
     return render(request, 'create_event.html', {'form': form})
-
-# Separate dashboard views for different user types
-@login_required(login_url='/login')
-def external_dashboard(request):
-    return HttpResponse("External Dashboard")
-
-@login_required(login_url='/login')
-def student_dashboard(request):
-    return HttpResponse("Student Dashboard")
-
-@login_required(login_url='/login')
-def volunteer_dashboard(request):
-    return HttpResponse("Volunteer Dashboard")
 
 
 from django.shortcuts import render
