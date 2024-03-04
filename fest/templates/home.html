@@ -12,11 +12,7 @@
     
         <div class="card mx-24 border shadow-xl rounded-lg px-2 py-2">
             
-            {% if event.thumbnail %}
-                <img src="{{ event.thumbnail.url }}" alt="{{ event.event_name }} thumbnail" class="rounded-lg" style="max-width: 400px; max-height: 400px;">
-            {% else %}
-                No thumbnail available.
-            {% endif %}
+            
             <br>
             {% comment %} <strong>{{ event.event_name }}</a></strong> {% endcomment %}
             <h3 class="text-xl font-semibold leading-none tracking-tighter text-neutral-600">{{ event.event_name }}</h3>

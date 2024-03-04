@@ -70,7 +70,7 @@ class Event(models.Model):
     event_date = models.DateField()
     event_name = models.CharField(max_length=100)
     event_type = models.CharField(max_length=100)
-    thumbnail = models.ImageField(upload_to='event_thumbnails/', null=True, blank=True)
+    # thumbnail = models.ImageField(upload_to='event_thumbnails/', null=True, blank=True)
     organizers = models.ManyToManyField(Organizer, related_name='organizer_events', related_query_name='organizer_event', blank=True)
     event_organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE, related_name='created_events', null=True)
 
