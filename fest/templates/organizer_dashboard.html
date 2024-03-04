@@ -1,16 +1,19 @@
-<!-- organizer_dashboard.html -->
 {% extends 'base.html' %}
 
 {% block content %}
   <h2>Organizer Dashboard</h2>
-  <div>
-    <h3>Create Event</h3>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Create Event</button>
-    </form>
-  </div>
-  <!-- Add other content as needed -->
+  
+  {% if created_events %}
+    {% for event in created_events %}
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{ event.event_name }}</h5>
+          <p class="card-text">{{ event.event_type }}</p>
+          <!-- Add other event details as needed -->
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No events created yet.</p>
+  {% endif %}
 {% endblock %}
-

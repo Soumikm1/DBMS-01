@@ -1,5 +1,32 @@
 from django.db import models
 from django.contrib.auth.models import User 
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils import timezone
+from datetime import timedelta
+from django.conf import settings
+
+class CustomUser(AbstractUser):
+    # add your custom fields here
+
+    # Specify related_name for groups and user_permissions
+    groups = models.ManyToManyField(Group, related_name='customuser_set', blank=True)
+    user_permissions = models.ManyToManyField(
+        Permission, related_name='customuser_set', blank=True
+    )
+
+    last_login = models.DateTimeField(blank=True, null=True)
+
+
+    def __str__(self):
+        return self.username
+
+    def update_last_login(self, request=None):
+        # Override update_last_login to avoid updating the last_login field
+        if request is not None:
+            if self.last_login is None or self.last_login < timezone.now() - timedelta(seconds=settings.SESSION_COOKIE_AGE):
+                self.last_login = timezone.now()
+                self.save(update_fields=['last_login'])
 
 class ExternalUser(models.Model):
     id = models.AutoField(primary_key=True)
@@ -27,12 +54,13 @@ from django.contrib.auth.models import User
 
 class Organizer(models.Model):
     id = models.AutoField(primary_key=True)
-    event_date = models.DateField()
-    event_name = models.CharField(max_length=100)
-    event_type = models.CharField(max_length=100)
     user_name = models.CharField(max_length=100)  # Jury's name
     password = models.CharField(max_length=100)
-    organized_events = models.ManyToManyField('Event', related_name='event_organizers', related_query_name='event_organizer')  # Updated field name
+    organized_events = models.ManyToManyField('Event', related_name='organizer_events', related_query_name='organizer_event')
+
+    def create_event(self, event_data):
+        event = Event.objects.create(**event_data, event_organizer=self)
+        return event
 
     def __str__(self):
         return self.user_name
@@ -43,7 +71,15 @@ class Event(models.Model):
     event_name = models.CharField(max_length=100)
     event_type = models.CharField(max_length=100)
     thumbnail = models.ImageField(upload_to='event_thumbnails/', null=True, blank=True)
-    organizers = models.ManyToManyField(Organizer, related_name='organizer_events', related_query_name='organizer_event', blank=True, null=True)  # Allow organizers to be null
+    organizers = models.ManyToManyField(Organizer, related_name='organizer_events', related_query_name='organizer_event', blank=True)
+    event_organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE, related_name='created_events', null=True)
+
+    def __str__(self):
+        return self.event_name
+
+    class Meta:
+        ordering = ['-event_date']
+
 
     def __str__(self):
         return self.event_name

@@ -116,26 +116,30 @@ def volunteer_login(request):
     else:
         return render(request, 'login.html')
 
-from django.contrib.auth import authenticate, login
-# from django.shortcuts import render, redirect, messages
+from django.contrib.auth.models import AnonymousUser
 
 def organizer_login(request):
     if request.method == 'POST':
         user_name = request.POST.get('user_name')
         password = request.POST.get('password')
 
-        user = authenticate(request, username=user_name, password=password)
-
+        user = authenticate_organizer(username=user_name, password=password)
         if user is not None:
+            # Ensure the user is an actual User object before calling login
+            if isinstance(user, AnonymousUser):
+                messages.error(request, 'Invalid username or password.')
+                return redirect('login')
+
             login(request, user)
             return redirect('organizer_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
-            return redirect('/')
+            return redirect('login')
     elif request.method == 'GET':
         return render(request, 'organizer_login.html')
     else:
         return render(request, 'login.html')
+
 
 
 
@@ -195,34 +199,36 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
 from .forms import EventCreationForm
 from .models import Organizer
+from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth.decorators import login_required
+from .forms import EventCreationForm
+from .models import Organizer
+from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth.decorators import login_required
+from .forms import EventCreationForm
+from .models import Organizer
 
 @login_required(login_url='/login')
 def create_event(request):
-    # Ensure the user is an organizer
-
-    if not Organizer.objects.filter(user_name=request.user).exists():
-        return HttpResponse("You don't have permission to access this page.")
-
     if request.method == 'POST':
         form = EventCreationForm(request.POST)
         if form.is_valid():
-            # Save the event with organizers in a single step
             event = form.save(commit=False)
-            event.user = request.user  # Assign current user as organizer
-            event.save()  # Save the event and related fields
 
-            # Alternative approach (if the user can belong to multiple organizers)
-            # organizers = Organizer.objects.filter(user=request.user)  # Get organizers for the user
-            # event.organizers.set(organizers)  # Add organizers to the event
+            # Assuming you have a way to determine the organizer, you can set it here
+            # For example, you might have a custom logic or a form field for selecting the organizer
+            # event.event_organizer = ...  # Set the organizer here
+
+            event.save()  # Save the event to generate the ID
+
+            # Now that the event has an ID, you can add the organizer to the many-to-many relationship
+            # event.organizers.add(...)  # Set the organizer for the many-to-many relationship
 
             return HttpResponse('Event created successfully')
     else:
         form = EventCreationForm()
 
     return render(request, 'create_event.html', {'form': form})
-
-from django.shortcuts import render
-
 
 # Separate dashboard views for different user types
 @login_required(login_url='/login')
@@ -238,9 +244,24 @@ def volunteer_dashboard(request):
     return HttpResponse("Volunteer Dashboard")
 
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Event, Organizer
+
+@login_required(login_url='/login')
 def organizer_dashboard(request):
-    # Your logic for the organizer dashboard goes here
-    return render(request, 'organizer_dashboard.html')
+    # Get the currently logged-in organizer
+    organizer = Organizer.objects.filter(user_name=request.user.username).first()
+
+    if organizer:
+        # Get the events created by the organizer
+        created_events = Event.objects.filter(event_organizer=organizer)
+        
+        # Pass the events to the template
+        return render(request, 'organizer_dashboard.html', {'created_events': created_events})
+    else:
+        return HttpResponse("You don't have permission to access this page.")
+
 
 # @login_required(login_url='/login')
 # def organizer_dashboard(request):
